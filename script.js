@@ -27,17 +27,20 @@ function createListElement() {
         saveListToLocalStorage();
     });
 
+    console.log("Item added:", li.textContent); // Debugging
     saveListToLocalStorage();
 }
 
 function addListAfterClick() {
     if (inputLength() > 0) {
+        console.log("Add button clicked, input value:", input.value); // Debugging
         createListElement();
     }
 }
 
 function addListAfterKeydown(event) {
     if (inputLength() > 0 && event.key === "Enter") {
+        console.log("Enter key pressed, input value:", input.value); // Debugging
         createListElement();
     }
 }
@@ -49,20 +52,23 @@ input.addEventListener("keydown", addListAfterKeydown);
 clearButton.addEventListener("click", function() {
     ul.innerHTML = "";
     localStorage.removeItem("shoppingList");
+    console.log("Shopping list cleared from localStorage"); // Debugging
 });
 
 // Save and load list to/from local storage
 function saveListToLocalStorage() {
     const items = Array.from(ul.children).map(li => ({
-        text: li.textContent,
+        text: li.textContent.trim(),
         done: li.classList.contains("done")
     }));
 
+    console.log("Saving to localStorage:", items); // Debugging
     localStorage.setItem("shoppingList", JSON.stringify(items));
 }
 
 function loadListFromLocalStorage() {
     const savedList = JSON.parse(localStorage.getItem("shoppingList")) || [];
+    console.log("Loaded items from localStorage:", savedList); // Debugging
 
     savedList.forEach(item => {
         const li = document.createElement("li");
@@ -88,6 +94,7 @@ function loadListFromLocalStorage() {
 }
 
 // Load the list when the page loads
-window.onload = function() {
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM fully loaded and parsed"); // Debugging
     loadListFromLocalStorage();
-};
+});
