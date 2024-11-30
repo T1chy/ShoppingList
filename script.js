@@ -11,20 +11,23 @@ function createListElement() {
     var li = document.createElement("li");
 
     li.appendChild(document.createTextNode(input.value));
-
     ul.appendChild(li);
     input.value = "";
 
     // Mark as done
     li.addEventListener("click", function () {
         li.classList.toggle("done");
+        saveListToLocalStorage();
     });
 
     // Right-click to delete
     li.addEventListener("contextmenu", function (event) {
         event.preventDefault();
         ul.removeChild(li);
+        saveListToLocalStorage();
     });
+
+    saveListToLocalStorage();
 }
 
 function addListAfterClick() {
@@ -43,7 +46,48 @@ button.addEventListener("click", addListAfterClick);
 
 input.addEventListener("keydown", addListAfterKeydown);
 
-// Clear all list items
 clearButton.addEventListener("click", function() {
     ul.innerHTML = "";
+    localStorage.removeItem("shoppingList");
 });
+
+// Save and load list to/from local storage
+function saveListToLocalStorage() {
+    const items = Array.from(ul.children).map(li => ({
+        text: li.textContent,
+        done: li.classList.contains("done")
+    }));
+
+    localStorage.setItem("shoppingList", JSON.stringify(items));
+}
+
+function loadListFromLocalStorage() {
+    const savedList = JSON.parse(localStorage.getItem("shoppingList")) || [];
+
+    savedList.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.text;
+
+        if (item.done) {
+            li.classList.add("done");
+        }
+
+        ul.appendChild(li);
+
+        li.addEventListener("click", function () {
+            li.classList.toggle("done");
+            saveListToLocalStorage();
+        });
+
+        li.addEventListener("contextmenu", function (event) {
+            event.preventDefault();
+            ul.removeChild(li);
+            saveListToLocalStorage();
+        });
+    });
+}
+
+// Load the list when the page loads
+window.onload = function() {
+    loadListFromLocalStorage();
+};
